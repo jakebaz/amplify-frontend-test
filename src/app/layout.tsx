@@ -39,7 +39,7 @@ export default function RootLayout({
             <div className="flex flex-col">
               <div className="flex justify-between p-8">
                 <h1 className="text-xl">Hello {user?.username}</h1>
-                <button onClick={signOut}>Sign Out</button>
+                <button className="border border-stone-900 cursor-pointer hover:underline p-2 rounded" onClick={signOut}>Sign Out</button>
               </div>
               {children}
             </div>
