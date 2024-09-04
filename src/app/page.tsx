@@ -1,19 +1,22 @@
 "use client"
 
-import Image from "next/image";
+import { Authenticator } from '@aws-amplify/ui-react';
 import { generateClient, GraphQLResult } from '@aws-amplify/api';
-import { useEffect, useState } from "react";
 import { getPosts } from "@/graphql/queries";
 import { GetPostsQuery, Post } from "@/API";
+import { useEffect, useState } from "react";
 
-const API = generateClient();
+const API = generateClient({
+  authMode: 'iam'
+});
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
 
   const fetchData = async () => {
     const result = await API.graphql({
-      query: getPosts
+      query: getPosts,
+      authMode: "iam"
     }) as GraphQLResult<GetPostsQuery>;
     console.log(result);
     const newPosts = result.data.getPosts
@@ -30,8 +33,20 @@ export default function Home() {
       <div className="flex gap-2 my-2">
         {posts.length ? posts.map((post) => (
           <p key={post.id}>{post.title} written by {post.author}</p>
-        )) : "No blog posts available"}
+        )) : <p>No blog posts available</p>}
       </div>
+
+      <Authenticator>
+          {({signOut, user}) => (
+            <>
+              <div className="flex justify-between p-8">
+                <h1 className="text-xl">Hello {user?.username}</h1>
+                <button className="border border-stone-900 cursor-pointer hover:underline p-2 rounded" onClick={signOut}>Sign Out</button>
+              </div>
+              <p>You must sign in to see this content</p>
+            </>
+          )}
+        </Authenticator>
     </main>
   );
 }
